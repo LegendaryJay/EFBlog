@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks.Dataflow;
@@ -49,6 +50,15 @@ namespace EFBlog
             return false;
         }
 
+        private static List<Post> GetPosts(Blog blog)
+        {
+            using var db = new BlogContext();
+            return (
+                from p in db.Posts
+                where p.BlogId == blog.BlogId
+                    select p
+                    ).ToList();
+        }
         private static void DisplayBlogs()
         {
             //this is SO COOL!!! 
@@ -76,14 +86,16 @@ namespace EFBlog
         private static void DisplayPosts()
         {
             if (!GetBlog(out var selectedBlog)) return;
+            var posts = GetPosts(selectedBlog);
             Console.WriteLine(selectedBlog.Name);
 
 
-            Console.WriteLine($"{selectedBlog.Posts.Count} Posts");
-            foreach (var post in selectedBlog.Posts)
+            Console.WriteLine($"{posts.Count} Posts");
+            foreach (var post in posts)
             {
-                Console.WriteLine($"{post.Blog.Name}");
-                Console.WriteLine($"{post.Title}");
+                Console.WriteLine();
+                Console.WriteLine($"Blog name: {selectedBlog.Name}");
+                Console.WriteLine($"Title: {post.Title}");
                 Console.WriteLine($"{post.Content}");
             }
         }
